@@ -105,6 +105,8 @@ namespace LiveSplit.Model
                 CurrentState.IsResumedRun = true;
 
                 OnResumePreviousRun?.Invoke(this, null);
+
+                Pause();
             }
         }
 
