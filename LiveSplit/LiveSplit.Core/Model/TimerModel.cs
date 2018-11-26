@@ -218,7 +218,7 @@ namespace LiveSplit.Model
                 OnResume?.Invoke(this, null);
             }
             else if (CurrentState.CurrentPhase == TimerPhase.NotRunning)
-                 Start(); //fuck abahbob                
+                 Start(); //f**k abahbob                
         }
 
         public void UndoAllPauses()
