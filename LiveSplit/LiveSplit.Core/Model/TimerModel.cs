@@ -70,18 +70,21 @@ namespace LiveSplit.Model
 
                 XmlNodeList segments = doc.GetElementsByTagName("Segment");
 
-                for (int i = 0; i < segments.Count; i++)
+                for (int i = 0; i < segments.Count - 1; i++)
                 {
                     if (segments[i].LastChild.InnerText != " | ")
                     {
                         CurrentState.CurrentSplit.SplitTime = Time.ParseText(segments[i].LastChild.InnerText);
-                        Console.WriteLine(CurrentState.CurrentSplitIndex + ": " + CurrentState.CurrentSplit.SplitTime);                        
+                        Console.WriteLine(CurrentState.CurrentSplitIndex + ": " + CurrentState.CurrentSplit.SplitTime);
                         CurrentState.CurrentSplitIndex++;
                     }
                 }
-                CurrentState.CurrentSplitIndex--;
+                //CurrentState.CurrentSplitIndex--;
+                Time resumeTime = Time.ParseText(segments[segments.Count - 1].LastChild.InnerText);
+                Console.WriteLine(CurrentState.CurrentSplitIndex + ": " + resumeTime);
 
-                string[] hms = CurrentState.CurrentSplit.SplitTime[CurrentState.CurrentTimingMethod].ToString().Split(':');
+                //string[] hms = CurrentState.CurrentSplit.SplitTime[CurrentState.CurrentTimingMethod].ToString().Split(':');
+                string[] hms = resumeTime[CurrentState.CurrentTimingMethod].ToString().Split(':');
 
                 int h = 0;
                 int m = 0;
@@ -92,8 +95,10 @@ namespace LiveSplit.Model
                 Double.TryParse(hms[2], out s);
 
                 Double totalSeconds = (h * 3600) + (m * 60) + s;
+                Console.WriteLine("Parsed Time: " + resumeTime + " = " + h + ", " + m + ", " + s + " (" + hms[2] + ")");
+
                 CurrentState.Run.Offset = TimeSpanParser.Parse(totalSeconds.ToString());
-                CurrentState.AdjustedStartTime = CurrentState.StartTimeWithOffset = TimeStamp.Now - CurrentState.Run.Offset;
+                CurrentState.AdjustedStartTime = CurrentState.StartTimeWithOffset = TimeStamp.Now - CurrentState.Run.Offset;                
 
                 CurrentState.AttemptStarted = TimeStamp.CurrentDateTime;                
                 CurrentState.StartTime = TimeStamp.Now;
