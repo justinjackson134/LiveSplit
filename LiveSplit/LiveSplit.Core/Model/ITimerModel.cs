@@ -1,5 +1,6 @@
 ﻿using LiveSplit.Model.Input;
 using System;
+using System.IO;
 
 namespace LiveSplit.Model
 {
@@ -11,6 +12,7 @@ namespace LiveSplit.Model
         event EventHandler OnUndoSplit;
         event EventHandler OnSkipSplit;
         event EventHandler OnStart;
+        event EventHandler OnResumePreviousRun;
         event EventHandlerT<TimerPhase> OnReset;
         event EventHandler OnPause;
         event EventHandler OnUndoAllPauses;
@@ -21,6 +23,7 @@ namespace LiveSplit.Model
         event EventHandler OnSwitchComparisonNext;
         
         void Start();
+        void ResumePreviousRun(Stream stream);
         void InitializeGameTime();
         void Split();
         void SkipSplit();

@@ -276,12 +276,13 @@ namespace LiveSplit.View
 
             CurrentState.OnReset += CurrentState_OnReset;
             CurrentState.OnStart += CurrentState_OnStart;
+            CurrentState.OnResumePreviousRun += CurrentState_OnResumePreviousRun;
             CurrentState.OnSplit += CurrentState_OnSplit;
             CurrentState.OnSkipSplit += CurrentState_OnSkipSplit;
             CurrentState.OnUndoSplit += CurrentState_OnUndoSplit;
             CurrentState.OnPause += CurrentState_OnPause;
-            CurrentState.OnUndoAllPauses += CurrentState_OnUndoAllPauses;
             CurrentState.OnResume += CurrentState_OnResume;
+            CurrentState.OnUndoAllPauses += CurrentState_OnUndoAllPauses;
             CurrentState.OnSwitchComparisonPrevious += CurrentState_OnSwitchComparisonPrevious;
             CurrentState.OnSwitchComparisonNext += CurrentState_OnSwitchComparisonNext;
 
@@ -630,6 +631,18 @@ namespace LiveSplit.View
             });
         }
 
+        void CurrentState_OnResumePreviousRun(object sender, EventArgs e)
+        {
+            this.InvokeIfRequired(() =>
+            {
+                pauseMenuItem.Enabled = true;
+                resetMenuItem.Enabled = true;
+                undoSplitMenuItem.Enabled = false;
+                skipSplitMenuItem.Enabled = true;
+                splitMenuItem.Text = "Split";
+            });
+        }
+
         void CurrentState_OnReset(object sender, TimerPhase e)
         {
             RegenerateComparisons();
@@ -650,15 +663,8 @@ namespace LiveSplit.View
                 skipSplitMenuItem.Enabled = false;
                 splitMenuItem.Enabled = true;
                 splitMenuItem.Text = "Start";
-            });
-        }
 
-        void CurrentState_OnResume(object sender, EventArgs e)
-        {
-            this.InvokeIfRequired(() =>
-            {
-                splitMenuItem.Text = "Split";
-                pauseMenuItem.Enabled = true;
+                CurrentState.IsResumedRun = false;
             });
         }
 
@@ -669,6 +675,16 @@ namespace LiveSplit.View
                 splitMenuItem.Text = "Resume";
                 undoPausesMenuItem.Enabled = true;
                 pauseMenuItem.Enabled = false;
+            });
+        }
+
+        void CurrentState_OnResume(object sender, EventArgs e)
+        {
+            this.InvokeIfRequired(() =>
+            {
+                splitMenuItem.Text = "Split";
+                pauseMenuItem.Enabled = true;
+                CurrentState.IsResumedRun = false;
             });
         }
 
@@ -1591,7 +1607,7 @@ namespace LiveSplit.View
             Close();
         }
 
-        private void SetRun(IRun run)
+        private void SetRun(IRun run, bool isResumedRun = false)
         {
             foreach (var icon in CurrentState.Run.Select(x => x.Icon).Except(run.Select(x => x.Icon)))
             {
@@ -2544,29 +2560,34 @@ namespace LiveSplit.View
 
         private void saveCurrentRunMenuItem_Click(object sender, EventArgs e)
         {
-            Model.Pause();
-            IRun currentRun = CurrentState.Run.Clone() as IRun;
+            if (CurrentState.CurrentPhase == TimerPhase.Running) Model.Pause();
 
-            // TODO: Remove
-            //for (int i = 0; i < CurrentState.CurrentSplitIndex; i++)
-            //{
-            //    Console.WriteLine(i + ": " + CurrentState.Run[i].SplitTime.ToString());
-            //}
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "XML Files|*.xml";
+            saveFileDialog.Title = "Save an In-Progress Run";
+            saveFileDialog.ShowDialog();
 
+            if (saveFileDialog.FileName != "")
+            {
+                FileStream fs = (FileStream)saveFileDialog.OpenFile();
 
-            var fileStream = File.Create("C:\\Users\\Justin\\Desktop\\LiveSplitSaves\\save.txt");
-            XMLMultiSplitSaver multiSplitSaver = new XMLMultiSplitSaver();
-            multiSplitSaver.Save(currentRun, fileStream);
+                XMLMultiSplitSaver multiSplitSaver = new XMLMultiSplitSaver();
+                multiSplitSaver.Save(CurrentState.Run, fs);
+
+                fs.Close();
+            }
         }
 
-        private void resumeCurrentRunMenuItem_Click(object sender, EventArgs e)
+        private void resumePriorRunMenuItem_Click(object sender, EventArgs e)
         {
-            IRun previousRun = CurrentState.Run.Clone() as IRun;
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "XML Files|*.xml";
+            openFileDialog.Title = "Load an In-Progress Run";
 
-            Model.Reset();
-            CurrentState.IsResumedRun = true;
-
-            SetRun(previousRun);
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                Model.ResumePreviousRun(openFileDialog.OpenFile());                
+            }
         }
 
         private void hotkeysMenuItem_Click(object sender, EventArgs e)

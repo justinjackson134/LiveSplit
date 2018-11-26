@@ -318,7 +318,7 @@
             this.resumePriorRunToolStripMenuItem.Name = "resumePriorRunToolStripMenuItem";
             this.resumePriorRunToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.resumePriorRunToolStripMenuItem.Text = "Resume Prior Run";
-            this.resumePriorRunToolStripMenuItem.Click += new System.EventHandler(this.resumeCurrentRunMenuItem_Click);
+            this.resumePriorRunToolStripMenuItem.Click += new System.EventHandler(this.resumePriorRunMenuItem_Click);
             // 
             // TimerForm
             // 

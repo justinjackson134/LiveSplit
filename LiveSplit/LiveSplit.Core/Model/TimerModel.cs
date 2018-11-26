@@ -1,5 +1,6 @@
 ﻿using LiveSplit.Model.Input;
 using System;
+using System.IO;
 using System.Linq;
 
 namespace LiveSplit.Model
@@ -25,6 +26,7 @@ namespace LiveSplit.Model
         public event EventHandler OnUndoSplit;
         public event EventHandler OnSkipSplit;
         public event EventHandler OnStart;
+        public event EventHandler OnResumePreviousRun;
         public event EventHandlerT<TimerPhase> OnReset;
         public event EventHandler OnPause;
         public event EventHandler OnUndoAllPauses;
@@ -47,8 +49,50 @@ namespace LiveSplit.Model
                 CurrentState.IsGameTimeInitialized = false;
                 CurrentState.Run.AttemptCount++;
                 CurrentState.Run.HasChanged = true;
+                CurrentState.IsResumedRun = false;
 
-                OnStart?.Invoke(this,null);
+                OnStart?.Invoke(this, null);
+            }
+        }
+
+        public void ResumePreviousRun(Stream stream)
+        {
+            if (CurrentState.CurrentPhase == TimerPhase.NotRunning)
+            {
+                CurrentState.CurrentPhase = TimerPhase.Running;
+
+                var cumulativeSplitTime = Time.Zero;
+                CurrentState.CurrentSplitIndex = 0;
+
+                CurrentState.CurrentSplit.SplitTime = Time.ParseText("00:00:10.0000000 | ");
+                cumulativeSplitTime = cumulativeSplitTime + CurrentState.CurrentSplit.SplitTime;
+                CurrentState.CurrentSplitIndex++;
+
+                string[] hms =  cumulativeSplitTime[CurrentState.CurrentTimingMethod].ToString().Split(':');
+
+                int h = 0;
+                int m = 0;
+                int s = 0;
+
+                Int32.TryParse(hms[0], out h);
+                Int32.TryParse(hms[1], out m);
+                Int32.TryParse(hms[2], out s);
+
+                int totalSeconds = (h * 3600) + (m * 60) + s;
+                                
+                CurrentState.Run.Offset += TimeSpanParser.Parse(totalSeconds.ToString());
+
+                CurrentState.AttemptStarted = TimeStamp.CurrentDateTime;
+                
+                CurrentState.AdjustedStartTime = CurrentState.StartTimeWithOffset = TimeStamp.Now - CurrentState.Run.Offset;
+                CurrentState.StartTime = TimeStamp.Now;
+                CurrentState.TimePausedAt = CurrentState.Run.Offset;
+                CurrentState.IsGameTimeInitialized = false;
+                CurrentState.Run.AttemptCount++;
+                CurrentState.Run.HasChanged = true;
+                CurrentState.IsResumedRun = true;
+
+                OnResumePreviousRun?.Invoke(this, null);
             }
         }
 

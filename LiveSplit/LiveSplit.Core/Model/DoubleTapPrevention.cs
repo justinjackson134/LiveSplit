@@ -1,5 +1,6 @@
 ﻿using LiveSplit.Model.Input;
 using System;
+using System.IO;
 
 namespace LiveSplit.Model
 {
@@ -31,6 +32,8 @@ namespace LiveSplit.Model
         public event EventHandler OnSkipSplit { add { InternalModel.OnSkipSplit += value; } remove { InternalModel.OnSkipSplit -= value; } }
 
         public event EventHandler OnStart { add { InternalModel.OnStart += value; } remove { InternalModel.OnStart -= value; } }
+
+        public event EventHandler OnResumePreviousRun { add { InternalModel.OnResumePreviousRun += value; } remove { InternalModel.OnResumePreviousRun -= value; } }
 
         public event EventHandlerT<TimerPhase> OnReset { add { InternalModel.OnReset += value; } remove { InternalModel.OnReset -= value; } }
 
@@ -70,6 +73,15 @@ namespace LiveSplit.Model
             if (CheckDoubleTap())
             {
                 InternalModel.Start();
+                LastEvent = TimeStamp.Now;
+            }
+        }
+
+        public void ResumePreviousRun(Stream stream)
+        {
+            if (CheckDoubleTap())
+            {
+                InternalModel.ResumePreviousRun(null);
                 LastEvent = TimeStamp.Now;
             }
         }

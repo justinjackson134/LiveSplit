@@ -76,6 +76,7 @@ namespace LiveSplit.Model
         public event EventHandler OnUndoSplit;
         public event EventHandler OnSkipSplit;
         public event EventHandler OnStart;
+        public event EventHandler OnResumePreviousRun;
         public event EventHandlerT<TimerPhase> OnReset;
         public event EventHandler OnPause;
         public event EventHandler OnUndoAllPauses;
@@ -153,6 +154,7 @@ namespace LiveSplit.Model
             AdjustedStartTime = StartTimeWithOffset = StartTime = TimeStamp.Now;
             CurrentPhase = TimerPhase.NotRunning;
             CurrentSplitIndex = -1;
+            IsResumedRun = false;
         }
 
         public object Clone()
@@ -188,6 +190,7 @@ namespace LiveSplit.Model
             model.OnSkipSplit                += (s, e) => OnSkipSplit?.Invoke(this, e);
             model.OnUndoSplit                += (s, e) => OnUndoSplit?.Invoke(this, e);
             model.OnStart                    += (s, e) => OnStart?.Invoke(this, e);
+            model.OnResumePreviousRun        += (s, e) => OnResumePreviousRun?.Invoke(this, e);
             model.OnReset                    += (s, e) => OnReset?.Invoke(this, e);
             model.OnPause                    += (s, e) => OnPause?.Invoke(this, e);
             model.OnUndoAllPauses            += (s, e) => OnUndoAllPauses?.Invoke(this, e);
