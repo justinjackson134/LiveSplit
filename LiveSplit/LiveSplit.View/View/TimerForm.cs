@@ -1625,6 +1625,7 @@ namespace LiveSplit.View
             run.FixSplits();
             DeactivateAutoSplitter();
             CurrentState.Run = run;
+            CurrentState.IsResumedRun = isResumedRun;
             InvalidationRequired = true;
             RegenerateComparisons();
             SwitchComparison(CurrentState.CurrentComparison);
@@ -2524,17 +2525,25 @@ namespace LiveSplit.View
 
             if (!ResetMessageShown)
             {
-                var result = DialogResult.Yes;
-                if (Settings.WarnOnReset && (!InTimerOnlyMode))
+                Console.WriteLine("CurrentState.IsResumedRun: " + CurrentState.IsResumedRun);
+                if (!CurrentState.IsResumedRun)
                 {
-                    ResetMessageShown = true;
-                    result = WarnAboutResetting();
+                    var result = DialogResult.Yes;
+                    if (Settings.WarnOnReset && (!InTimerOnlyMode))
+                    {
+                        ResetMessageShown = true;
+                        result = WarnAboutResetting();
+                    }
+                    if (result == DialogResult.Yes)
+                        Model.Reset();
+                    else if (result == DialogResult.No)
+                        Model.Reset(false);
+                    ResetMessageShown = false;
                 }
-                if (result == DialogResult.Yes)
-                    Model.Reset();
-                else if (result == DialogResult.No)
+                else
+                {
                     Model.Reset(false);
-                ResetMessageShown = false;
+                }
             }
         }
 
@@ -2561,13 +2570,14 @@ namespace LiveSplit.View
         private void saveCurrentRunMenuItem_Click(object sender, EventArgs e)
         {
             if (CurrentState.CurrentPhase == TimerPhase.Running) Model.Pause();
+            CurrentState.IsResumedRun = true;
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "XML Files|*.xml";
             saveFileDialog.Title = "Save an In-Progress Run";
             saveFileDialog.ShowDialog();
 
-            SaveSplits(false);
+            //SaveSplits(false);
 
             if (saveFileDialog.FileName != "")
             {
@@ -2589,7 +2599,7 @@ namespace LiveSplit.View
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 String fileName = openFileDialog.FileName;
-                Model.ResumePreviousRun(fileName);                
+                Model.ResumePreviousRun(fileName);
             }
         }
 

@@ -75,8 +75,7 @@ namespace LiveSplit.Model
                     if (segments[i].LastChild.InnerText != " | ")
                     {
                         CurrentState.CurrentSplit.SplitTime = Time.ParseText(segments[i].LastChild.InnerText);
-                        
-                        Console.WriteLine(CurrentState.CurrentSplitIndex + ": " + CurrentState.CurrentSplit.SplitTime);
+                        Console.WriteLine(CurrentState.CurrentSplitIndex + ": " + CurrentState.CurrentSplit.SplitTime);                        
                         CurrentState.CurrentSplitIndex++;
                     }
                 }
@@ -93,7 +92,7 @@ namespace LiveSplit.Model
                 Double.TryParse(hms[2], out s);
 
                 Double totalSeconds = (h * 3600) + (m * 60) + s;
-                CurrentState.Run.Offset += TimeSpanParser.Parse(totalSeconds.ToString());
+                CurrentState.Run.Offset = TimeSpanParser.Parse(totalSeconds.ToString());
                 CurrentState.AdjustedStartTime = CurrentState.StartTimeWithOffset = TimeStamp.Now - CurrentState.Run.Offset;
 
                 CurrentState.AttemptStarted = TimeStamp.CurrentDateTime;                
@@ -103,6 +102,8 @@ namespace LiveSplit.Model
                 CurrentState.Run.AttemptCount++;
                 CurrentState.Run.HasChanged = true;
                 CurrentState.IsResumedRun = true;
+
+
 
                 OnResumePreviousRun?.Invoke(this, null);
 
@@ -167,6 +168,13 @@ namespace LiveSplit.Model
         {
             if (CurrentState.CurrentPhase != TimerPhase.NotRunning)
             {
+                Console.WriteLine("CurrentState.IsResumedRun: " + CurrentState.IsResumedRun.ToString());
+                if (CurrentState.IsResumedRun)
+                {
+                    CurrentState.IsResumedRun = false;
+                    CurrentState.Run.Offset = TimeSpanParser.Parse("0");
+                    Console.WriteLine("CurrentState.Run.Offset: " + CurrentState.Run.Offset.ToString());
+                }
                 ResetState(updateSplits);
                 ResetSplits();
             }
