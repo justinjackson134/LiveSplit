@@ -18,6 +18,32 @@ namespace LiveSplit.Model.RunSavers
             parent.Attributes.Append(ToAttribute(document, "version", "1.7.0"));
             document.AppendChild(parent);
 
+            CreateSetting(document, parent, "GameIcon", run.GameIcon);
+            CreateSetting(document, parent, "GameName", run.GameName);
+            CreateSetting(document, parent, "CategoryName", run.CategoryName);
+
+            var metadata = document.CreateElement("Metadata"); var runElement = document.CreateElement("Run");
+            runElement.Attributes.Append(ToAttribute(document, "id", run.Metadata.RunID));
+            metadata.AppendChild(runElement);
+
+            var platform = ToElement(document, "Platform", run.Metadata.PlatformName);
+            platform.Attributes.Append(ToAttribute(document, "usesEmulator", run.Metadata.UsesEmulator));
+            metadata.AppendChild(platform);
+
+            CreateSetting(document, metadata, "Region", run.Metadata.RegionName);
+
+            var variables = document.CreateElement("Variables");
+            foreach (var variable in run.Metadata.VariableValueNames)
+            {
+                var variableElement = ToElement(document, "Variable", variable.Value);
+                variableElement.Attributes.Append(ToAttribute(document, "name", variable.Key));
+                variables.AppendChild(variableElement);
+            }
+            metadata.AppendChild(variables);
+            parent.AppendChild(metadata);
+
+            CreateSetting(document, parent, "Offset", run.Offset);
+
             var segmentElement = document.CreateElement("Segments");
             parent.AppendChild(segmentElement);
 
@@ -30,6 +56,11 @@ namespace LiveSplit.Model.RunSavers
                 CreateSetting(document, splitElement, "Icon", segment.Icon);
                 CreateSetting(document, splitElement, "SplitTime", segment.SplitTime);
             }
+
+            var autoSplitterSettings = document.CreateElement("AutoSplitterSettings");
+            if (run.IsAutoSplitterActive())
+                autoSplitterSettings.InnerXml = run.AutoSplitter.Component.GetSettings(document).InnerXml;
+            parent.AppendChild(autoSplitterSettings);
 
             document.Save(stream);
         }
