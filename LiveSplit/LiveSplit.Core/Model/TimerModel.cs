@@ -103,8 +103,6 @@ namespace LiveSplit.Model
                 CurrentState.Run.HasChanged = true;
                 CurrentState.IsResumedRun = true;
 
-
-
                 OnResumePreviousRun?.Invoke(this, null);
 
                 Pause();
@@ -168,7 +166,6 @@ namespace LiveSplit.Model
         {
             if (CurrentState.CurrentPhase != TimerPhase.NotRunning)
             {
-                Console.WriteLine("CurrentState.IsResumedRun: " + CurrentState.IsResumedRun.ToString());
                 if (CurrentState.IsResumedRun)
                 {
                     CurrentState.IsResumedRun = false;

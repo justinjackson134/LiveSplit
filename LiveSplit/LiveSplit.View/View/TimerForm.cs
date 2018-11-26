@@ -2525,7 +2525,7 @@ namespace LiveSplit.View
 
             if (!ResetMessageShown)
             {
-                Console.WriteLine("CurrentState.IsResumedRun: " + CurrentState.IsResumedRun);
+                Console.WriteLine("TimerForm.Reset() - CurrentState.IsResumedRun: " + CurrentState.IsResumedRun);
                 if (!CurrentState.IsResumedRun)
                 {
                     var result = DialogResult.Yes;
@@ -2600,6 +2600,9 @@ namespace LiveSplit.View
             {
                 String fileName = openFileDialog.FileName;
                 Model.ResumePreviousRun(fileName);
+                CurrentState.IsResumedRun = true;
+
+                RefreshComparisonItems();
             }
         }
 
