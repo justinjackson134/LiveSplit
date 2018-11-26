@@ -77,11 +77,11 @@ namespace LiveSplit.Model
             }
         }
 
-        public void ResumePreviousRun(Stream stream)
+        public void ResumePreviousRun(string fileName)
         {
             if (CheckDoubleTap())
             {
-                InternalModel.ResumePreviousRun(null);
+                InternalModel.ResumePreviousRun(fileName);
                 LastEvent = TimeStamp.Now;
             }
         }

@@ -23,7 +23,7 @@ namespace LiveSplit.Model
         event EventHandler OnSwitchComparisonNext;
         
         void Start();
-        void ResumePreviousRun(Stream stream);
+        void ResumePreviousRun(string fileName);
         void InitializeGameTime();
         void Split();
         void SkipSplit();

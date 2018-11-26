@@ -2567,12 +2567,14 @@ namespace LiveSplit.View
             saveFileDialog.Title = "Save an In-Progress Run";
             saveFileDialog.ShowDialog();
 
+            SaveSplits(false);
+
             if (saveFileDialog.FileName != "")
             {
                 FileStream fs = (FileStream)saveFileDialog.OpenFile();
 
                 XMLMultiSplitSaver multiSplitSaver = new XMLMultiSplitSaver();
-                multiSplitSaver.Save(CurrentState.Run, fs);
+                multiSplitSaver.Save(CurrentState, fs);
 
                 fs.Close();
             }
@@ -2586,7 +2588,8 @@ namespace LiveSplit.View
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                Model.ResumePreviousRun(openFileDialog.OpenFile());                
+                String fileName = openFileDialog.FileName;
+                Model.ResumePreviousRun(fileName);                
             }
         }
 

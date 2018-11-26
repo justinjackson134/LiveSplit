@@ -7,8 +7,10 @@ namespace LiveSplit.Model.RunSavers
 {
     public class XMLMultiSplitSaver
     {
-        public void Save(IRun run, Stream stream)
+        public void Save(LiveSplitState state, Stream stream)
         {
+            IRun run = state.Run;
+
             var document = new XmlDocument();
 
             XmlNode docNode = document.CreateXmlDeclaration("1.0", "UTF-8", null);
@@ -47,15 +49,35 @@ namespace LiveSplit.Model.RunSavers
             var segmentElement = document.CreateElement("Segments");
             parent.AppendChild(segmentElement);
 
-            foreach (var segment in run)
-            {
-                var splitElement = document.CreateElement("Segment");
-                segmentElement.AppendChild(splitElement);
+            //foreach (var segment in run)
+            //{
+            //    var splitElement = document.CreateElement("Segment");
+            //    segmentElement.AppendChild(splitElement);
 
-                CreateSetting(document, splitElement, "Name", segment.Name);
-                CreateSetting(document, splitElement, "Icon", segment.Icon);
-                CreateSetting(document, splitElement, "SplitTime", segment.SplitTime);
+            //    CreateSetting(document, splitElement, "Name", segment.Name);
+            //    CreateSetting(document, splitElement, "Icon", segment.Icon);
+            //    CreateSetting(document, splitElement, "SplitTime", segment.SplitTime);
+            //}
+                        
+            for (int i = 0; i < run.Count; i++)
+            {
+                if (run[i].SplitTime.ToString() != " | ")
+                {
+                    var splitElement = document.CreateElement("Segment");
+                    segmentElement.AppendChild(splitElement);
+
+                    CreateSetting(document, splitElement, "Name", run[i].Name);
+                    CreateSetting(document, splitElement, "Icon", run[i].Icon);
+                    CreateSetting(document, splitElement, "SplitTime", run[i].SplitTime);                    
+                }
             }
+
+            var lastSplitElement = document.CreateElement("Segment");
+            segmentElement.AppendChild(lastSplitElement);
+
+            CreateSetting(document, lastSplitElement, "Name", state.CurrentSplit.Name);
+            CreateSetting(document, lastSplitElement, "Icon", state.CurrentSplit.Icon);
+            CreateSetting(document, lastSplitElement, "SplitTime", state.CurrentTime);
 
             var autoSplitterSettings = document.CreateElement("AutoSplitterSettings");
             if (run.IsAutoSplitterActive())

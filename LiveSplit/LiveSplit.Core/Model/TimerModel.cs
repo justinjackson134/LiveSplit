@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Xml;
 
 namespace LiveSplit.Model
 {
@@ -55,7 +56,7 @@ namespace LiveSplit.Model
             }
         }
 
-        public void ResumePreviousRun(Stream stream)
+        public void ResumePreviousRun(string fileName)
         {
             if (CurrentState.CurrentPhase == TimerPhase.NotRunning)
             {
@@ -64,27 +65,38 @@ namespace LiveSplit.Model
                 var cumulativeSplitTime = Time.Zero;
                 CurrentState.CurrentSplitIndex = 0;
 
-                CurrentState.CurrentSplit.SplitTime = Time.ParseText("00:00:10.0000000 | ");
-                cumulativeSplitTime = cumulativeSplitTime + CurrentState.CurrentSplit.SplitTime;
-                CurrentState.CurrentSplitIndex++;
+                XmlDocument doc = new XmlDocument();
+                doc.Load(fileName);
 
-                string[] hms =  cumulativeSplitTime[CurrentState.CurrentTimingMethod].ToString().Split(':');
+                XmlNodeList segments = doc.GetElementsByTagName("Segment");
+
+                for (int i = 0; i < segments.Count; i++)
+                {
+                    if (segments[i].LastChild.InnerText != " | ")
+                    {
+                        CurrentState.CurrentSplit.SplitTime = Time.ParseText(segments[i].LastChild.InnerText);
+                        
+                        Console.WriteLine(CurrentState.CurrentSplitIndex + ": " + CurrentState.CurrentSplit.SplitTime);
+                        CurrentState.CurrentSplitIndex++;
+                    }
+                }
+                CurrentState.CurrentSplitIndex--;
+
+                string[] hms = CurrentState.CurrentSplit.SplitTime[CurrentState.CurrentTimingMethod].ToString().Split(':');
 
                 int h = 0;
                 int m = 0;
-                int s = 0;
+                Double s = 0;
 
                 Int32.TryParse(hms[0], out h);
                 Int32.TryParse(hms[1], out m);
-                Int32.TryParse(hms[2], out s);
+                Double.TryParse(hms[2], out s);
 
-                int totalSeconds = (h * 3600) + (m * 60) + s;
-                                
+                Double totalSeconds = (h * 3600) + (m * 60) + s;
                 CurrentState.Run.Offset += TimeSpanParser.Parse(totalSeconds.ToString());
-
-                CurrentState.AttemptStarted = TimeStamp.CurrentDateTime;
-                
                 CurrentState.AdjustedStartTime = CurrentState.StartTimeWithOffset = TimeStamp.Now - CurrentState.Run.Offset;
+
+                CurrentState.AttemptStarted = TimeStamp.CurrentDateTime;                
                 CurrentState.StartTime = TimeStamp.Now;
                 CurrentState.TimePausedAt = CurrentState.Run.Offset;
                 CurrentState.IsGameTimeInitialized = false;
