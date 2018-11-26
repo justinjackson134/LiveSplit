@@ -62,6 +62,16 @@ namespace LiveSplit.Model
             }
         }
 
+        private bool isResumedRun;
+        public bool IsResumedRun
+        {
+            get { return isResumedRun; }
+            set
+            {
+                isResumedRun = value;
+            }
+        }
+
         public event EventHandler OnSplit;
         public event EventHandler OnUndoSplit;
         public event EventHandler OnSkipSplit;
@@ -167,7 +177,8 @@ namespace LiveSplit.Model
                 CurrentHotkeyProfile = CurrentHotkeyProfile,
                 CurrentTimingMethod = CurrentTimingMethod,
                 AttemptStarted = AttemptStarted,
-                AttemptEnded = AttemptEnded
+                AttemptEnded = AttemptEnded,
+                IsResumedRun = IsResumedRun
             };
         }
 
@@ -195,7 +206,7 @@ namespace LiveSplit.Model
                 if (IsGameTimePaused)
                     GameTimePauseTime = gameTime.Value;
             }
-        }
+        }        
 
         public void CallRunManuallyModified() => RunManuallyModified?.Invoke(this, null);
 

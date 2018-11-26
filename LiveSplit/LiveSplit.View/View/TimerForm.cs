@@ -2542,6 +2542,33 @@ namespace LiveSplit.View
             Model.UndoAllPauses();
         }
 
+        private void saveCurrentRunMenuItem_Click(object sender, EventArgs e)
+        {
+            Model.Pause();
+            IRun currentRun = CurrentState.Run.Clone() as IRun;
+
+            // TODO: Remove
+            //for (int i = 0; i < CurrentState.CurrentSplitIndex; i++)
+            //{
+            //    Console.WriteLine(i + ": " + CurrentState.Run[i].SplitTime.ToString());
+            //}
+
+
+            var fileStream = File.Create("C:\\Users\\Justin\\Desktop\\LiveSplitSaves\\save.txt");
+            XMLMultiSplitSaver multiSplitSaver = new XMLMultiSplitSaver();
+            multiSplitSaver.Save(currentRun, fileStream);
+        }
+
+        private void resumeCurrentRunMenuItem_Click(object sender, EventArgs e)
+        {
+            IRun previousRun = CurrentState.Run.Clone() as IRun;
+
+            Model.Reset();
+            CurrentState.IsResumedRun = true;
+
+            SetRun(previousRun);
+        }
+
         private void hotkeysMenuItem_Click(object sender, EventArgs e)
         {
             var hotkeyProfile = Settings.HotkeyProfiles[CurrentState.CurrentHotkeyProfile];

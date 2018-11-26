@@ -18,6 +18,8 @@ namespace LiveSplit.Model
         int AttemptCount { get; set; }
         IList<Attempt> AttemptHistory { get; set; }
 
+        bool IsResumedRun { get; set; }
+
         AutoSplitter AutoSplitter { get; set; }
         XmlElement AutoSplitterSettings { get; set; }
 

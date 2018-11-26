@@ -74,6 +74,11 @@ namespace LiveSplit.Model
         /// 
         /// </summary>
         public IList<Attempt> AttemptHistory { get; set; }
+        
+        /// <summary>
+        /// Gets or sets whether this is a resumed (multi-split) run
+        /// </summary>
+        public bool IsResumedRun { get; set; }
 
         public AutoSplitter AutoSplitter { get; set; }
         public XmlElement AutoSplitterSettings { get; set; }
@@ -172,7 +177,8 @@ namespace LiveSplit.Model
                 CustomComparisons = new List<string>(CustomComparisons),
                 ComparisonGenerators = new List<IComparisonGenerator>(ComparisonGenerators),
                 AutoSplitter = AutoSplitter != null ? AutoSplitter.Clone() : null,
-                AutoSplitterSettings = AutoSplitterSettings
+                AutoSplitterSettings = AutoSplitterSettings,
+                IsResumedRun = IsResumedRun
             };
             return newRun;
         }

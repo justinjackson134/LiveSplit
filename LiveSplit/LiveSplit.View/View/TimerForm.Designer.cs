@@ -311,12 +311,14 @@
             this.saveCurrentRunToolStripMenuItem.Name = "saveCurrentRunToolStripMenuItem";
             this.saveCurrentRunToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveCurrentRunToolStripMenuItem.Text = "Save Current Run";
+            this.saveCurrentRunToolStripMenuItem.Click += new System.EventHandler(this.saveCurrentRunMenuItem_Click);
             // 
             // resumePriorRunToolStripMenuItem
             // 
             this.resumePriorRunToolStripMenuItem.Name = "resumePriorRunToolStripMenuItem";
             this.resumePriorRunToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.resumePriorRunToolStripMenuItem.Text = "Resume Prior Run";
+            this.resumePriorRunToolStripMenuItem.Click += new System.EventHandler(this.resumeCurrentRunMenuItem_Click);
             // 
             // TimerForm
             // 
