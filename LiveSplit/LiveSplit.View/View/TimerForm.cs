@@ -2569,24 +2569,31 @@ namespace LiveSplit.View
 
         private void saveCurrentRunMenuItem_Click(object sender, EventArgs e)
         {
-            if (CurrentState.CurrentPhase == TimerPhase.Running) Model.Pause();
-            CurrentState.IsResumedRun = true;
-
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "XML Files|*.xml";
-            saveFileDialog.Title = "Save an In-Progress Run";
-            saveFileDialog.ShowDialog();
-
-            //SaveSplits(false);
-
-            if (saveFileDialog.FileName != "")
+            if (CurrentState.CurrentPhase != TimerPhase.NotRunning)
             {
-                FileStream fs = (FileStream)saveFileDialog.OpenFile();
+                if (CurrentState.CurrentPhase == TimerPhase.Running) Model.Pause();
+                CurrentState.IsResumedRun = true;
 
-                XMLMultiSplitSaver multiSplitSaver = new XMLMultiSplitSaver();
-                multiSplitSaver.Save(CurrentState, fs);
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Filter = "XML Files|*.xml";
+                saveFileDialog.Title = "Save an In-Progress Run";
+                saveFileDialog.ShowDialog();
 
-                fs.Close();
+                //SaveSplits(false);
+
+                if (saveFileDialog.FileName != "")
+                {
+                    FileStream fs = (FileStream)saveFileDialog.OpenFile();
+
+                    XMLMultiSplitSaver multiSplitSaver = new XMLMultiSplitSaver();
+                    multiSplitSaver.Save(CurrentState, fs);
+
+                    fs.Close();
+                }
+            }
+            else
+            {
+                // Timer is not running, this was not an active run
             }
         }
 
